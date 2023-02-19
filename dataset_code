@@ -1,0 +1,33 @@
+import pandas as pd
+import glob
+import numpy as np
+import re
+import requests
+from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
+
+liste = [1,2,3,4,5,6,7,8,9,10]
+i = 0
+list = []
+for i in liste:
+    root= "https://www.imdb.com/title/tt2582846/reviews?sort=curated&dir=desc&ratingFilter="
+    url = f'{root}{i}'
+    R = requests.get(url)
+    Soup = BeautifulSoup(R.text, "html.parser")
+    Name = Soup.find("div",{"class":"lister"}).find_all("div",{"class":"lister-item-content"})
+    for name in Name:  
+        rating = name.span.text.strip()
+        #title = name.find("a",{"class":"title"}).text.strip("\n")
+        title = name.find("a",{"class":"title"}).text.strip("\n")
+        comment_text = title
+        data = {#"movie_title": title,
+                "comment": comment_text,
+		    	"label": rating,
+			    }
+        list.append(data)
+    for movie in list:
+        print('Starring:', movie['comment'], movie['label'])
+    df = pd.DataFrame(list)
+    df.to_csv('dataset_1.csv',index=False)
+
+i+=1
